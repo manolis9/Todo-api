@@ -41,7 +41,7 @@ app.post('/todos', function(req, res) {
 	var body = _.pick(req.body, 'description', 'completed');
 
 	if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0){
-		return res.status(400).send(); //request can't be completed because bad data was provided
+		return res.status(400).send(); //request can't be completed because bad data was provided (Bad Request)
 	}
 
 	body.description = body.description.trim();
@@ -53,6 +53,20 @@ app.post('/todos', function(req, res) {
 	todos.push(body);
 
 	res.json(body);
+});
+
+//DELETE /todos/:id
+app.delete('/todos/:id', function(req, res) {
+
+	var todoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {id: todoId});
+
+	if(matchedTodo){
+		todos = _.without(todos, matchedTodo);
+		res.json(matchedTodo);
+	} else {	
+		res.status(404).json({"Error": "no todo found with that id"}); //not found
+	}
 });
 
 app.listen(PORT, function() {
